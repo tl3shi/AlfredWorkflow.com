@@ -13,6 +13,7 @@ endif;
 $home = exec('printf $HOME');
 $maildir = "$home/Library/Mail/V2";
 
+
 $results = $utils->local_find(
 	"(kMDItemContentType == 'com.apple.mail.emlx') && (kMDItemSubject == '*".$query."*'c || kMDItemAuthors == '*".$query."*'c || kMDItemAuthorEmailAddresses == '*".$query."*'c)"
 );
@@ -27,10 +28,10 @@ foreach( $results as $k => $v ):
 	exec("mdls -name kMDItemAuthors -raw '$v'", $subtitle);
 
 	$subtitle = trim( str_replace( "\"", "" , $subtitle[1] ) );
-
+	$utf8sub = preg_replace("#\\\u([0-9a-f]+)#ie","iconv('UCS-2','UTF-8', pack('H4', '\\1'))", $subtitle);
 	$temp = array(
-		'title' => utf8_encode( htmlentities( $title[0] ) ),
-		'subtitle' => "From: ". utf8_encode( htmlentities( $subtitle ) ),
+		'title' => $title[0],
+		'subtitle' => "From: ". $utf8sub ,
 		'icon' => 'icon.png',
 		'uid' => '',
 		'arg' => $v
